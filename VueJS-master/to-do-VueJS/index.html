@@ -1,0 +1,160 @@
+<html>
+
+<head>
+    <title>Index</title>
+    <script src="https://unpkg.com/vue"></script>
+    <link rel="stylesheet" type="text/css" href="app.css">
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <p class="title">todos</p>
+            <input class="checkAll" @change="changeAll(changeAllModel)" v-model="changeAllModel" type="checkbox">
+            <input type="text" v-on:keyup.enter="addMentor" v-model="mentor">
+        </div>
+        <ol>
+            <todo-item :todo="item" :index="index" v-for="(item, index) in arrayTodos" @on-change="updateItem"></todo-item>
+        </ol>
+
+        <div>
+            <span>{{count}} item left</span>
+            <button @click="temp = 'all'">All</button>
+            <button @click="temp = 'active'">Active</button>
+            <button @click="temp = 'completed'">Completed</button>
+            <button @click="clickClear">Clear</button>
+        </div>
+    </div>
+    <script>
+        Vue.component('todo-item', {
+            props: ['index', 'todo'],
+            data() {
+                return {
+                    data: this.todo
+                }
+            },
+            watch: {
+                todo() {
+                    this.data = this.todo;
+                }
+            },
+            methods: {
+                changeStatus() {
+                    this.$emit('on-change', 'changeStatus', {
+                        index: this.index,
+                        status: this.data.status
+                    });
+                },
+                editTodoChild() {
+                    this.$emit('on-change', 'editContent', {
+                        index: this.index,
+                        content: this.data.content
+                    });
+                },
+                removeItemChild(index) {
+                    this.$emit('on-change', 'removeItem', {
+                        index: this.index
+                    });
+                }
+            },
+            template: `
+                <li>
+                    <input id="checkboxItem" type="checkbox" v-model="data.status" @change="changeStatus()">
+                    <label v-bind:style="[data.status ? { 'textDecoration':'line-through','color':'red'}:{'textDecoration':'none','color':'blue'}]"
+                        @dblclick="editTodoChild(data.content)">{{data.content}}</label>
+                    <img @click="removeItemChild(index)" src="./assets/icons/removeItem.jpg">
+                </li>
+            `
+        });
+        
+        new Vue({
+            el: '#app',
+            data: {
+                temp: 'all',
+                changeAllModel: false,
+                mentor: "",
+                mentors: []
+            },
+
+            computed: {
+                arrayTodos() {
+                    if (this.temp == "all") {
+                        return this.mentors;
+                    }
+                    if (this.temp == "active") {
+                        let temp = this.mentors.filter(function (mentor) {
+                            return !mentor.status;
+                        });
+                        return temp;
+                    }
+                    if (this.temp == "completed") {
+                        return this.mentors.filter(function (mentor) {
+                            return mentor.status;
+                        });
+                    }
+                },
+                count: function () {
+                    let c = 0;
+                    this.mentors.forEach(element => {
+                        if (element.status == false)
+                            c++;
+                    });
+                    return c
+                }
+            },
+
+            methods: {
+                changeAll: function (changeAllModel) {
+                    if (changeAllModel) {
+                        this.mentors.forEach(element => {
+                            element.status = true;
+                        });
+                    } else {
+                        this.mentors.forEach(element => {
+                            element.status = false;
+                        });
+                    }
+                },
+                addMentor: function () {
+                    if (this.mentor != "") {
+                        this.mentors.push({
+                            content: this.mentor,
+                            status: false
+                        })
+                        this.mentor = ""
+                    }
+                },
+                updateItem: function (actionType, newValue) {
+                    console.log('actionType: ', actionType);
+                    console.log('newValue: ', newValue);
+                    if (actionType === 'changeStatus') {
+                        let { index, status } = newValue;
+                        // TODO:
+                        this.mentors[index].status = status;
+                    }
+
+                    if (actionType === 'editContent') {
+                        let { index, content } = newValue;
+                        // TODO:
+                        this.mentors[index].content = content;
+                    }
+
+                    if (actionType === 'removeItem') {
+                        let { index } = newValue;
+                        // TODO:
+                        this.mentors.splice(index, 1);
+                    }
+
+                    //this.mentors[id][propsName] = newValue;
+                },
+                clickClear: function () {
+                    this.mentors = this.mentors.filter(function (mentor) {
+                        return !mentor.status;
+                    });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
