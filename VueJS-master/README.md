@@ -345,7 +345,74 @@ import ComponentChild from "ComponentChild.vue";
   })
 </script>
 ```
- 
+**Computed**: Computed trong Vue là khi giá trị bên trong nó 'return' thay đổi thì giá trị 'reversedMessage' cũng tự động thay đổi theo.
+
+- Example
+
+```html
+<template>
+  <div id="example">
+    <p>Original message: "{{ message }}"</p>
+    <p>Computed reversed message: "{{ reversedMessage }}"</p>
+  </div>
+</template>
+```
+
+```javascript
+<script>
+   var vm = new Vue({
+     el: '#example',
+     data: {
+       message: 'Hello'
+     },
+     computed: {
+       reversedMessage: ()=> {
+         return this.message.split('').reverse().join('')
+       }
+     }
+   })
+</script>
+```
+
+**Watch**: **watch** trong Vue khi giá trị 'isChange' được thay đổi, thì nó sẽ thực hiện những gì bên trong hàm đó.
+**Created**: **created** trong Vue khi component được sử dụng tới thì các giá trị bên trong 'created' sẽ được khởi tạo.
+
+- Example
+
+```html
+<template>
+  <div id="example">
+    <p>Original message: "{{ message }}"</p>
+    <p>Computed reversed message: "{{ reversedMessage }}"</p>
+  </div>
+</template>
+```
+
+```javascript
+<script>
+   var vm = new Vue({
+     el: '#example',
+     data: {
+       message: 'Hello World',
+       reversedMessage:'',
+       isChange: false,
+     },
+     created(){
+       this.changeTimeOut();  
+     },
+     watch: {
+       isChange() {
+          this.reversedMessage = this.message;
+       }
+     },
+     methods: {
+         changeTimeOut() {
+             setTimeout(function(){ this.isChange = true; }, 3000);
+         }
+     }
+   })
+</script>
+```
 #### 2. Vue Cli
  
   - Bước 1: Để chạy được VueJS trên server, ta tạo 1 folder vào thanh local gõ cmd để bật màn hình console và gõ lệnh **npm install -g @vue/cli**
